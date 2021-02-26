@@ -5,31 +5,21 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
-name: Deploy in Staging
+name: Deploy
 
 on:
   push:
-    branches: [ master, main ]
+    branches:
+      - master # Changing the branch here would also work
 
 jobs:
-  deploy:
-
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby 2.7
-    # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-    # change this to (see https://github.com/ruby/setup-ruby#versioning):
-      uses: ruby/setup-ruby@v1
-    # uses: ruby/setup-ruby@21351ecc0a7c196081abca5dc55b08f085efe09a
-      with:
-        ruby-version: 2.7.2
-    - name: Install dependencies
-      run: bundle install
-    - name: Add remote origin
-      run: |
-        git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-    - name: Deploy to Heroku
-      run: |
-        git push heroku main -f
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
+          heroku_email: "patrick.lionnel@finetechgroup.com"
+          remote_branch: "main"
